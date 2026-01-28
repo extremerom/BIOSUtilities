@@ -1,0 +1,11 @@
+UII Size      : 0x40
+Checksum      : 0x120B
+Tool Version  : 0x00000000
+Info Size     : 0x20
+Supported BIOS: UEFI
+Supported OS  : Windows
+Data Bus Width: 64b
+Program Type  : Executable
+Program Mode  : Console
+SourceSafe Tag: 00
+Description   : [... An AMI UCORE2 Project ...]

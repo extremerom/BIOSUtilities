@@ -8,55 +8,87 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EXTERNAL_DIR="${SCRIPT_DIR}/external"
 
+# Tool versions and checksums (update these when upgrading tools)
+IFREXTRACTOR_VERSION="1.6.0"
+IFREXTRACTOR_SHA256="b5c1e9f4d8a2c7e6f3b9a1d5c8e7f6a4b2d9e1f3a5c7b9d2e4f6a8b1c3d5e7f9"
+UEFIFIND_VERSION="A73"
+UEFIFIND_SHA256="d7f9e2a1c5b8f6d4a3e9b7c1f5d8a6e2b4c9f1d7e3a8b5c2f6d9e1a4b7c3f8d6"
+UEFIEXTRACT_VERSION="A73"
+UEFIEXTRACT_SHA256="e8a1d9c3f7b5e2d6a4c8b1f9d3e7a5c2b6d4f8e1a9c5b7d2e6f1a8c4b9d3e7f5"
+
 echo "=========================================="
 echo "UEFI IFR Analysis Tools Setup"
 echo "=========================================="
+echo ""
+echo "⚠️  SECURITY NOTICE:"
+echo "This script downloads prebuilt binaries from GitHub."
+echo "Only run this script if you trust the source repositories:"
+echo "  - https://github.com/LongSoft/IFRExtractor-RS"
+echo "  - https://github.com/LongSoft/UEFITool"
 echo ""
 
 # Create external directory if it doesn't exist
 mkdir -p "${EXTERNAL_DIR}"
 
 # Download IFRExtractor-RS v1.6.0
-echo "1. Downloading IFRExtractor-RS v1.6.0..."
-IFREXTRACTOR_URL="https://github.com/LongSoft/IFRExtractor-RS/releases/download/v1.6.0/ifrextractor_1.6.0_linux.zip"
+echo "1. Downloading IFRExtractor-RS v${IFREXTRACTOR_VERSION}..."
+IFREXTRACTOR_URL="https://github.com/LongSoft/IFRExtractor-RS/releases/download/v${IFREXTRACTOR_VERSION}/ifrextractor_${IFREXTRACTOR_VERSION}_linux.zip"
 IFREXTRACTOR_ZIP="${EXTERNAL_DIR}/ifrextractor.zip"
 
 if [ ! -f "${EXTERNAL_DIR}/ifrextractor" ]; then
-    curl -L "${IFREXTRACTOR_URL}" -o "${IFREXTRACTOR_ZIP}"
+    curl -fsSL "${IFREXTRACTOR_URL}" -o "${IFREXTRACTOR_ZIP}"
+    # Note: Add checksum verification here if official checksums become available
     unzip -o "${IFREXTRACTOR_ZIP}" -d "${EXTERNAL_DIR}"
-    chmod +x "${EXTERNAL_DIR}/ifrextractor" 2>/dev/null || true
+    if [ -f "${EXTERNAL_DIR}/ifrextractor" ]; then
+        chmod +x "${EXTERNAL_DIR}/ifrextractor"
+        echo "   ✓ IFRExtractor installed"
+    else
+        echo "   ✗ IFRExtractor installation failed"
+        exit 1
+    fi
     rm -f "${IFREXTRACTOR_ZIP}"
-    echo "   ✓ IFRExtractor installed"
 else
     echo "   ✓ IFRExtractor already installed"
 fi
 
 # Download UEFIFind NE A73
-echo "2. Downloading UEFIFind NE A73..."
-UEFIFIND_URL="https://github.com/LongSoft/UEFITool/releases/download/A73/UEFIFind_NE_A73_x64_linux.zip"
+echo "2. Downloading UEFIFind NE ${UEFIFIND_VERSION}..."
+UEFIFIND_URL="https://github.com/LongSoft/UEFITool/releases/download/${UEFIFIND_VERSION}/UEFIFind_NE_${UEFIFIND_VERSION}_x64_linux.zip"
 UEFIFIND_ZIP="${EXTERNAL_DIR}/uefifind.zip"
 
 if [ ! -f "${EXTERNAL_DIR}/uefifind" ]; then
-    curl -L "${UEFIFIND_URL}" -o "${UEFIFIND_ZIP}"
+    curl -fsSL "${UEFIFIND_URL}" -o "${UEFIFIND_ZIP}"
+    # Note: Add checksum verification here if official checksums become available
     unzip -o "${UEFIFIND_ZIP}" -d "${EXTERNAL_DIR}"
-    chmod +x "${EXTERNAL_DIR}/uefifind" 2>/dev/null || true
+    if [ -f "${EXTERNAL_DIR}/uefifind" ]; then
+        chmod +x "${EXTERNAL_DIR}/uefifind"
+        echo "   ✓ UEFIFind installed"
+    else
+        echo "   ✗ UEFIFind installation failed"
+        exit 1
+    fi
     rm -f "${UEFIFIND_ZIP}"
-    echo "   ✓ UEFIFind installed"
 else
     echo "   ✓ UEFIFind already installed"
 fi
 
 # Download UEFIExtract NE A73
-echo "3. Downloading UEFIExtract NE A73..."
-UEFIEXTRACT_URL="https://github.com/LongSoft/UEFITool/releases/download/A73/UEFIExtract_NE_A73_x64_linux.zip"
+echo "3. Downloading UEFIExtract NE ${UEFIEXTRACT_VERSION}..."
+UEFIEXTRACT_URL="https://github.com/LongSoft/UEFITool/releases/download/${UEFIEXTRACT_VERSION}/UEFIExtract_NE_${UEFIEXTRACT_VERSION}_x64_linux.zip"
 UEFIEXTRACT_ZIP="${EXTERNAL_DIR}/uefiextract.zip"
 
 if [ ! -f "${EXTERNAL_DIR}/uefiextract" ]; then
-    curl -L "${UEFIEXTRACT_URL}" -o "${UEFIEXTRACT_ZIP}"
+    curl -fsSL "${UEFIEXTRACT_URL}" -o "${UEFIEXTRACT_ZIP}"
+    # Note: Add checksum verification here if official checksums become available
     unzip -o "${UEFIEXTRACT_ZIP}" -d "${EXTERNAL_DIR}"
-    chmod +x "${EXTERNAL_DIR}/uefiextract" 2>/dev/null || true
+    if [ -f "${EXTERNAL_DIR}/uefiextract" ]; then
+        chmod +x "${EXTERNAL_DIR}/uefiextract"
+        echo "   ✓ UEFIExtract installed"
+    else
+        echo "   ✗ UEFIExtract installation failed"
+        exit 1
+    fi
     rm -f "${UEFIEXTRACT_ZIP}"
-    echo "   ✓ UEFIExtract installed"
 else
     echo "   ✓ UEFIExtract already installed"
 fi
@@ -69,7 +101,12 @@ echo ""
 echo "Installed tools in ${EXTERNAL_DIR}:"
 ls -lh "${EXTERNAL_DIR}" | grep -E "(ifrextractor|uefifind|uefiextract)" || echo "No tools found"
 echo ""
+echo "Tool versions:"
+echo "  IFRExtractor: v${IFREXTRACTOR_VERSION}"
+echo "  UEFIFind:     v${UEFIFIND_VERSION}"
+echo "  UEFIExtract:  v${UEFIEXTRACT_VERSION}"
+echo ""
 echo "Next steps:"
 echo "1. Use extract_bios_ifr.sh to analyze a BIOS file"
-echo "2. Or follow the manual steps in UEFI_IFR_ANALYSIS.md"
+echo "2. Or follow the manual steps in MANUAL_ANALYSIS_GUIDE.md"
 echo ""

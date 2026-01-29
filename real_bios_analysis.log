@@ -1,0 +1,41 @@
+==========================================
+UEFI IFR Analysis
+==========================================
+
+BIOS file: out/Winflash.exe_extracted_3rd/BIOS_00.bin
+Output directory: ./out/BIOS_00_analysis
+
+Step 1: Extracting UEFI modules...
+   ✓ Modules extracted to ./out/BIOS_00_analysis/01_modules
+
+Step 2: Searching for Setup modules...
+   ✓ Search results saved to ./out/BIOS_00_analysis/02_setup_search.log
+
+Step 3: Extracting IFR data from modules...
+   ✓ Extracted IFR data from 0 module(s)
+
+Step 4: Searching for key combinations...
+   ✓ Key search results saved to ./out/BIOS_00_analysis/04_key_combinations.txt
+
+==========================================
+Analysis Complete!
+==========================================
+
+Results saved to: ./out/BIOS_00_analysis
+
+Next steps:
+1. Check ./out/BIOS_00_analysis/04_key_combinations.txt
+2. Review IFR files in ./out/BIOS_00_analysis/03_ifr_data
+3. Try common key combinations (Ctrl+F1, etc.) in BIOS
+
+============================================
+Key Combinations and Hidden Options Found
+============================================
+
+No obvious key combinations found.
+
+Manual analysis recommended:
+- Review IFR files in ./out/BIOS_00_analysis/03_ifr_data
+- Look for form definitions and question IDs
+- Common hidden options use Ctrl+F1, Ctrl+F2, etc.
+

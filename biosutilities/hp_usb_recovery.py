@@ -135,6 +135,34 @@ class HpUsbRecoveryOrganizer:
             file_count = sum(1 for _ in hp_dest.rglob('*') if _.is_file())
             print(f'  ✓ Copied HP folder structure ({file_count} files)')
             
+            # Create EFI/BOOT structure for UEFI boot
+            efi_boot_path = self.output_path / 'EFI' / 'BOOT'
+            efi_boot_path.mkdir(parents=True, exist_ok=True)
+            
+            # Also create EFI/HP/BIOS/New as alternative location
+            efi_hp_bios_path = self.output_path / 'EFI' / 'HP' / 'BIOS' / 'New'
+            efi_hp_bios_path.mkdir(parents=True, exist_ok=True)
+            
+            # Copy main EFI files to EFI/BOOT for UEFI booting
+            efi_files_copied = False
+            for efi_file in hp_dest.rglob('*.efi'):
+                if 'HpBiosUpdate' in efi_file.name:
+                    # Copy to EFI/BOOT as BOOTx64.efi (standard UEFI bootloader name)
+                    if 'HpBiosUpdate.efi' == efi_file.name and not efi_files_copied:
+                        bootx64_dest = efi_boot_path / 'BOOTx64.efi'
+                        shutil.copy2(efi_file, bootx64_dest)
+                        print(f'  ✓ Copied {efi_file.name} to EFI/BOOT/BOOTx64.efi')
+                        efi_files_copied = True
+                    
+                    # Also copy to EFI/BOOT with original name
+                    dest = efi_boot_path / efi_file.name
+                    shutil.copy2(efi_file, dest)
+                    print(f'  ✓ Copied {efi_file.name} to EFI/BOOT/')
+                    
+                    # Copy to alternative EFI/HP/BIOS/New location
+                    dest_hp = efi_hp_bios_path / efi_file.name
+                    shutil.copy2(efi_file, dest_hp)
+            
             # Also copy EFI files to root for easier access during recovery
             efi_root = self.output_path / 'EFI_Tools'
             efi_root.mkdir(exist_ok=True)
@@ -144,7 +172,9 @@ class HpUsbRecoveryOrganizer:
                 if 'HpBiosUpdate' in efi_file.name or 'HpBiosMgmt' in efi_file.name:
                     dest = efi_root / efi_file.name
                     shutil.copy2(efi_file, dest)
-                    print(f'  ✓ Copied {efi_file.name} to EFI_Tools/')
+            
+            print(f'  ✓ Created EFI/BOOT structure for UEFI boot')
+            print(f'  ✓ Created EFI/HP/BIOS/New alternative location')
         else:
             print('  ⚠ HP folder not found in input directory')
     
@@ -184,6 +214,10 @@ USB Drive (Root)
 
 - **Hewlett-Packard/BIOS/Current/**: Official HP BIOS recovery folder
   - Contains all BIOS binary files (*.bin) and signature files (*.sig)
+- **EFI/BOOT/**: UEFI boot structure
+  - BOOTx64.efi - Standard UEFI bootloader
+  - HpBiosUpdate*.efi - HP BIOS update tools
+- **EFI/HP/BIOS/New/**: Alternative HP EFI location
 - **HP/**: HP utilities and EFI files
 - **EFI_Tools/**: Key EFI recovery tools  
 - **BIOS_Backup/**: Backup copy of all extracted BIOS files

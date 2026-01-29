@@ -25,6 +25,10 @@ USB Drive (Root)
 
 - **Hewlett-Packard/BIOS/Current/**: Official HP BIOS recovery folder
   - Contains all BIOS binary files (*.bin) and signature files (*.sig)
+- **EFI/BOOT/**: UEFI boot structure
+  - BOOTx64.efi - Standard UEFI bootloader
+  - HpBiosUpdate*.efi - HP BIOS update tools
+- **EFI/HP/BIOS/New/**: Alternative HP EFI location
 - **HP/**: HP utilities and EFI files
 - **EFI_Tools/**: Key EFI recovery tools  
 - **BIOS_Backup/**: Backup copy of all extracted BIOS files

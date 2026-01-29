@@ -229,6 +229,7 @@ is_extracted: bool = parse_format()
 * [Dell PFS Update Extractor](#dell-pfs-update-extractor)
 * [Fujitsu SFX BIOS Extractor](#fujitsu-sfx-bios-extractor)
 * [Fujitsu UPC BIOS Extractor](#fujitsu-upc-bios-extractor)
+* [HP BIOS Recovery USB Organizer](#hp-bios-recovery-usb-organizer) ⭐ **New!**
 * [Insyde iFlash/iFdPacker Extractor](#insyde-iflashifdpacker-extractor)
 * [Panasonic BIOS Package Extractor](#panasonic-bios-package-extractor)
 * [Phoenix TDK Packer Extractor](#phoenix-tdk-packer-extractor)
@@ -435,6 +436,58 @@ No additional optional arguments are provided for this utility.
 #### Requirements
 
 * TianoCompress (required)
+
+### HP BIOS Recovery USB Organizer
+
+``` text
+HpUsbRecoveryOrganizer
+```
+
+#### Description
+
+Organizes extracted HP BIOS files into a proper USB recovery structure for HP laptop BIOS recovery. This utility takes the output from BIOS extraction (typically from AMI UCP or other HP BIOS packages) and reorganizes the files into the correct folder structure that HP laptops expect for BIOS recovery via USB drive. The organized structure includes the main BIOS binary file (renamed as HPBIOS.bin), HP utilities, EFI recovery tools, signature files, and a comprehensive README with recovery instructions. This is particularly useful for creating bootable USB drives to recover corrupted or failed BIOS on HP laptops using the emergency recovery feature (typically accessed via Win+B or Fn+B key combinations at startup).
+
+See the [HP BIOS Recovery Guide](HP_BIOS_RECOVERY_GUIDE.md) for detailed instructions in English and Spanish.
+
+#### Usage
+
+Standalone script:
+
+``` bash
+python hp_usb_recovery_tool.py <input_directory> [output_directory]
+```
+
+Example:
+
+``` bash
+python hp_usb_recovery_tool.py ./out/Winflash.exe_extracted_3rd ./USB_Recovery
+```
+
+As a module:
+
+``` python
+from biosutilities.hp_usb_recovery import organize_hp_usb_recovery
+
+success = organize_hp_usb_recovery('./out/Winflash.exe_extracted_3rd', './USB_Recovery')
+```
+
+#### Output Structure
+
+The utility creates a USB-ready folder structure with:
+- **HPBIOS.bin**: Main BIOS recovery file
+- **HP/**: Original HP utilities folder structure
+- **EFI_Tools/**: Key EFI files for recovery
+- **BIOS_Backup/**: Backup of all extracted BIOS binaries
+- **Signatures/**: Digital signature files
+- **README_BIOS_RECOVERY.txt**: Detailed recovery instructions
+
+#### Arguments
+
+No additional optional arguments are provided for this utility.
+
+#### Requirements
+
+No additional requirements are needed for this utility.
 
 ### Insyde iFlash/iFdPacker Extractor
 

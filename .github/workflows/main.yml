@@ -35,17 +35,19 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path bios -Force
           .\sp154137.exe -pdf -fbios -s
+          if ($LASTEXITCODE -ne 0) {
+            throw "BIOS extraction failed with exit code: $LASTEXITCODE"
+          }
           
       - name: Verify extraction
         shell: pwsh
         run: |
           Write-Host "Contents of bios directory:"
           Get-ChildItem -Path bios -Recurse | Select-Object FullName
-          $fileCount = (Get-ChildItem -Path bios -File -Recurse).Count
+          $fileCount = @(Get-ChildItem -Path bios -File -Recurse).Count
           Write-Host "Total files extracted: $fileCount"
           if ($fileCount -eq 0) {
-            Write-Error "No files were extracted to the bios directory!"
-            exit 1
+            throw "No files were extracted to the bios directory!"
           }
 
       - name: Upload BIOS artifacts

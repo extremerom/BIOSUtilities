@@ -4,6 +4,8 @@
 
 Este documento explica cómo usar las herramientas prebuilt de LongSoft para extraer módulos UEFI y datos IFR (Internal Forms Representation) de archivos BIOS, con el objetivo de encontrar combinaciones de teclas que activen opciones avanzadas ocultas en el BIOS.
 
+📖 **Para una lista completa de combinaciones de teclas conocidas por fabricante y modelo, consulta [BIOS_KEY_COMBINATIONS.md](BIOS_KEY_COMBINATIONS.md)**
+
 ## Herramientas Utilizadas
 
 Las siguientes herramientas prebuilt se descargan automáticamente:

@@ -584,6 +584,8 @@ Key combinations often found to unlock advanced BIOS options:
 
 Note: Try these key combinations at the POST screen or within specific BIOS menus.
 
+**For a comprehensive list of key combinations by manufacturer and model, see [BIOS_KEY_COMBINATIONS.md](BIOS_KEY_COMBINATIONS.md).**
+
 #### Manual Analysis
 
 For detailed manual analysis steps, see [UEFI_IFR_ANALYSIS.md](UEFI_IFR_ANALYSIS.md).

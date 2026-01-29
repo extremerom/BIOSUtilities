@@ -210,6 +210,8 @@ Tools Used:
 For More Information:
 ---------------------
 See UEFI_IFR_ANALYSIS.md for detailed manual analysis steps.
+See BIOS_KEY_COMBINATIONS.md for comprehensive list of known key
+combinations by manufacturer and model.
 EOF
 
 echo "=========================================="

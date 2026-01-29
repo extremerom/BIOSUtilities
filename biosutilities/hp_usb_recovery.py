@@ -80,30 +80,39 @@ class HpUsbRecoveryOrganizer:
             return False
     
     def _organize_bios_files(self):
-        """Find and copy BIOS binary files to the root of USB structure."""
+        """Find and copy BIOS binary files to the HP BIOS recovery structure."""
         print('\n[1/4] Organizing BIOS binary files...')
+        
+        # Create the official HP BIOS recovery folder structure
+        # USB/Hewlett-Packard/BIOS/Current/
+        hp_bios_path = self.output_path / 'Hewlett-Packard' / 'BIOS' / 'Current'
+        hp_bios_path.mkdir(parents=True, exist_ok=True)
         
         # Look for BIOS binary files (typically BIOS_XX.bin)
         bios_files = list(self.input_path.glob('BIOS_*.bin'))
+        sig_files = list(self.input_path.glob('BIOS_*.sig'))
         
         if bios_files:
-            # Copy the main BIOS file (usually BIOS_00.bin or largest file)
-            main_bios = max(bios_files, key=lambda f: f.stat().st_size)
+            # Copy ALL BIOS binary files to the Current folder
+            # HP recovery process needs all components
+            for bios_file in bios_files:
+                dest = hp_bios_path / bios_file.name
+                shutil.copy2(bios_file, dest)
+                print(f'  ✓ Copied {bios_file.name} to Hewlett-Packard/BIOS/Current/ ({bios_file.stat().st_size:,} bytes)')
             
-            # HP BIOS recovery typically looks for specific filenames
-            # Common recovery names: HPBIOS.bin, BIOSUPDATE.bin
-            recovery_name = self.output_path / 'HPBIOS.bin'
-            shutil.copy2(main_bios, recovery_name)
-            print(f'  ✓ Copied {main_bios.name} → HPBIOS.bin ({main_bios.stat().st_size:,} bytes)')
+            # Copy signature files
+            for sig_file in sig_files:
+                dest = hp_bios_path / sig_file.name
+                shutil.copy2(sig_file, dest)
+                print(f'  ✓ Copied {sig_file.name} to Hewlett-Packard/BIOS/Current/')
             
-            # Also copy all BIOS files with original names for reference
+            # Also create a backup directory at root for reference
             bios_backup_dir = self.output_path / 'BIOS_Backup'
             bios_backup_dir.mkdir(exist_ok=True)
             
             for bios_file in bios_files:
                 dest = bios_backup_dir / bios_file.name
                 shutil.copy2(bios_file, dest)
-                print(f'  ✓ Backed up {bios_file.name} ({bios_file.stat().st_size:,} bytes)')
         else:
             print('  ⚠ No BIOS binary files found')
     
@@ -140,21 +149,9 @@ class HpUsbRecoveryOrganizer:
             print('  ⚠ HP folder not found in input directory')
     
     def _organize_signature_files(self):
-        """Copy signature files for verification."""
+        """Signature files are already copied with BIOS files to Current folder."""
         print('\n[3/4] Organizing signature files...')
-        
-        sig_files = list(self.input_path.glob('*.sig'))
-        
-        if sig_files:
-            sig_dir = self.output_path / 'Signatures'
-            sig_dir.mkdir(exist_ok=True)
-            
-            for sig_file in sig_files:
-                dest = sig_dir / sig_file.name
-                shutil.copy2(sig_file, dest)
-                print(f'  ✓ Copied {sig_file.name}')
-        else:
-            print('  ⚠ No signature files found')
+        print('  ✓ Signature files copied to Hewlett-Packard/BIOS/Current/')
     
     def _create_readme(self):
         """Create a README file with instructions."""
@@ -164,20 +161,40 @@ class HpUsbRecoveryOrganizer:
 
 This USB drive contains the necessary files for HP laptop BIOS recovery.
 
+## ⚠️ CRITICAL: Folder Structure
+
+HP BIOS recovery requires files to be in a SPECIFIC folder structure:
+
+```
+USB Drive (Root)
+└── Hewlett-Packard/
+    └── BIOS/
+        └── Current/
+            ├── BIOS_00.bin
+            ├── BIOS_00.sig
+            ├── BIOS_01.bin
+            ├── BIOS_01.sig
+            ├── BIOS_02.bin
+            └── BIOS_02.sig
+```
+
+⚠️ **DO NOT CHANGE** this folder structure! The HP BIOS recovery process specifically looks for files in the `Hewlett-Packard/BIOS/Current/` directory.
+
 ## Contents
 
-- **HPBIOS.bin**: Main BIOS binary file for recovery
+- **Hewlett-Packard/BIOS/Current/**: Official HP BIOS recovery folder
+  - Contains all BIOS binary files (*.bin) and signature files (*.sig)
 - **HP/**: HP utilities and EFI files
-- **EFI_Tools/**: Key EFI recovery tools
-- **BIOS_Backup/**: Backup of all extracted BIOS files
-- **Signatures/**: Digital signature files for verification
+- **EFI_Tools/**: Key EFI recovery tools  
+- **BIOS_Backup/**: Backup copy of all extracted BIOS files
 
 ## How to Use
 
 ### Preparation
 1. Format a USB drive as FAT32 (recommended: 8GB or larger)
 2. Copy ALL contents of this folder to the root of the USB drive
-3. Safely eject the USB drive
+3. Verify that the folder structure is: `[USB Drive]/Hewlett-Packard/BIOS/Current/`
+4. Safely eject the USB drive
 
 ### BIOS Recovery Process
 1. **Turn off** the HP laptop completely
@@ -196,14 +213,17 @@ This USB drive contains the necessary files for HP laptop BIOS recovery.
 - Keep the laptop connected to AC power during recovery
 - Do NOT remove the USB drive until the process is complete
 - The laptop may restart multiple times - this is normal
+- DO NOT modify the Hewlett-Packard/BIOS/Current/ folder structure
 
 ℹ️ **Compatibility**:
 - This recovery structure is designed for HP laptops
 - Different HP models may have different key combinations
+- Some models use Win+V instead of Win+B
 - Consult your laptop's documentation for specific recovery instructions
 
 ℹ️ **Alternative Recovery Methods**:
-- Some HP models support UEFI recovery by placing files in EFI/HP/BIOS/
+- If Win+B doesn't work, try Win+V
+- Some HP models require Fn+Esc, then Fn+B
 - Check HP support website for model-specific recovery instructions
 
 ## File Information
@@ -215,6 +235,7 @@ For more information, visit: https://github.com/platomav/BIOSUtilities
 
 **Recovery doesn't start:**
 - Ensure USB is formatted as FAT32 (not exFAT or NTFS)
+- Verify the folder structure is exactly: Hewlett-Packard/BIOS/Current/
 - Try different USB ports (prefer USB 2.0 ports)
 - Verify the key combination for your specific HP model
 - Some models require Fn+Esc, then Fn+B

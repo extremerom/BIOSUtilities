@@ -3,3 +3,7 @@
 /biosutilities/external/
 /external/
 /venv/
+/out/
+*.zip
+__pycache__/
+*.pyc

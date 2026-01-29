@@ -234,6 +234,7 @@ is_extracted: bool = parse_format()
 * [Phoenix TDK Packer Extractor](#phoenix-tdk-packer-extractor)
 * [Portwell EFI Update Extractor](#portwell-efi-update-extractor)
 * [Toshiba BIOS COM Extractor](#toshiba-bios-com-extractor)
+* [UEFI IFR Analysis Tools](#uefi-ifr-analysis-tools)
 * [VAIO Packaging Manager Extractor](#vaio-packaging-manager-extractor)
 
 ### AMI BIOS Guard Extractor
@@ -528,6 +529,126 @@ No additional optional arguments are provided for this utility.
 #### Requirements
 
 * ToshibaComExtractor (required)
+
+### UEFI IFR Analysis Tools
+
+#### Description
+
+Manual analysis tools to extract UEFI modules and IFR (Internal Forms Representation) data from BIOS images. These tools help discover hidden BIOS options and key combinations to unlock advanced BIOS menus.
+
+The tools use prebuilt binaries from LongSoft's projects:
+* **IFRExtractor-RS v1.6.0** - Extracts IFR data from UEFI modules
+* **UEFIFind NE A73** - Searches for patterns and text in UEFI images
+* **UEFIExtract NE A73** - Extracts modules from UEFI images
+
+#### Quick Start
+
+``` bash
+# 1. Download and setup tools
+chmod +x setup_ifr_tools.sh
+./setup_ifr_tools.sh
+
+# 2. Analyze a BIOS file
+chmod +x extract_bios_ifr.sh
+./extract_bios_ifr.sh mybios.bin
+```
+
+The analysis script will:
+1. Extract all UEFI modules from the BIOS
+2. Search for Setup-related modules
+3. Extract IFR data from PE32 modules
+4. Search for key combinations and hidden options
+5. Generate a summary report
+
+#### Output Structure
+
+The analysis creates an `out/<biosname>_analysis/` directory with:
+
+* `01_modules/` - All extracted UEFI modules
+* `02_setup_search.log` - Search results for Setup keywords
+* `03_ifr_data/` - IFR text files extracted from modules
+* `04_key_combinations.txt` - Potential key combinations found
+* `README.txt` - Analysis summary with instructions
+
+#### Common Key Combinations
+
+Key combinations often found to unlock advanced BIOS options:
+
+* **Ctrl + F1** - Most common for advanced menu
+* **Ctrl + F2** - Alternative advanced menu
+* **Alt + F1** - Hidden options
+* **Alt + F2** - Debug menu
+* **Shift + F1** - OEM options
+* **Right Ctrl + Right Shift + F2** - Complex combination
+* **Left Alt + Right Alt + F2** - Dual modifier
+
+Note: Try these key combinations at the POST screen or within specific BIOS menus.
+
+#### Manual Analysis
+
+For detailed manual analysis steps, see [UEFI_IFR_ANALYSIS.md](UEFI_IFR_ANALYSIS.md).
+
+The manual process involves:
+1. Extracting UEFI modules with UEFIExtract
+2. Finding Setup modules with UEFIFind
+3. Extracting IFR data with IFRExtractor
+4. Analyzing IFR text files for:
+   - HotKey definitions (key combinations)
+   - Suppress If statements (hidden options)
+   - Gray-Out If statements (disabled options)
+   - Question IDs and form definitions
+
+#### IFR Data Analysis
+
+IFR files contain BIOS menu definitions in a readable format. Look for:
+
+**HotKey Definitions:**
+```
+One Of: Hidden Option
+  HotKey:
+    Scan Code: 0x0B    # F1
+    Modifier: Ctrl     # Control key
+```
+
+**Suppressed (Hidden) Options:**
+```
+Suppress If {True}
+  One Of: Advanced Settings
+    ...
+  End One Of
+End
+```
+
+**Grayed-Out (Disabled) Options:**
+```
+Gray-Out If {condition}
+  One Of: Overclocking
+    ...
+  End One Of
+End
+```
+
+#### Tools Sources
+
+* [IFRExtractor-RS](https://github.com/LongSoft/IFRExtractor-RS/releases/tag/v1.6.0)
+* [UEFITool (UEFIFind/UEFIExtract)](https://github.com/LongSoft/UEFITool/releases/tag/A73)
+
+#### Security Warning
+
+⚠️ **WARNING**: Modifying advanced BIOS options can:
+* Damage hardware
+* Cause system instability
+* Void warranty
+* Make the system unbootable
+
+Use at your own risk and only if you understand the implications.
+
+#### Requirements
+
+* Linux system (prebuilt binaries for Linux x64)
+* curl (for downloading tools)
+* unzip (for extracting tools)
+* bash (for running scripts)
 
 ### VAIO Packaging Manager Extractor
 

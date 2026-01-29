@@ -3,3 +3,8 @@
 /biosutilities/external/
 /external/
 /venv/
+/out/
+/HP_USB_Recovery/
+/biosutilities/HP_USB_Recovery/
+__pycache__/
+*.pyc

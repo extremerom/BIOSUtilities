@@ -7,3 +7,6 @@
 *.zip
 __pycache__/
 *.pyc
+*.log
+/real_analysis/
+/manual_analysis/

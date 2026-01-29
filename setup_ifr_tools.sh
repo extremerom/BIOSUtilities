@@ -8,13 +8,13 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EXTERNAL_DIR="${SCRIPT_DIR}/external"
 
-# Tool versions and checksums (update these when upgrading tools)
+# Tool versions (update these when upgrading tools)
 IFREXTRACTOR_VERSION="1.6.0"
-IFREXTRACTOR_SHA256="b5c1e9f4d8a2c7e6f3b9a1d5c8e7f6a4b2d9e1f3a5c7b9d2e4f6a8b1c3d5e7f9"
 UEFIFIND_VERSION="A73"
-UEFIFIND_SHA256="d7f9e2a1c5b8f6d4a3e9b7c1f5d8a6e2b4c9f1d7e3a8b5c2f6d9e1a4b7c3f8d6"
 UEFIEXTRACT_VERSION="A73"
-UEFIEXTRACT_SHA256="e8a1d9c3f7b5e2d6a4c8b1f9d3e7a5c2b6d4f8e1a9c5b7d2e6f1a8c4b9d3e7f5"
+
+# Note: Official SHA256 checksums are not provided by LongSoft
+# Consider verifying downloads manually or checking file types after download
 
 echo "=========================================="
 echo "UEFI IFR Analysis Tools Setup"
@@ -36,12 +36,22 @@ IFREXTRACTOR_URL="https://github.com/LongSoft/IFRExtractor-RS/releases/download/
 IFREXTRACTOR_ZIP="${EXTERNAL_DIR}/ifrextractor.zip"
 
 if [ ! -f "${EXTERNAL_DIR}/ifrextractor" ]; then
-    curl -fsSL "${IFREXTRACTOR_URL}" -o "${IFREXTRACTOR_ZIP}"
-    # Note: Add checksum verification here if official checksums become available
-    unzip -o "${IFREXTRACTOR_ZIP}" -d "${EXTERNAL_DIR}"
+    echo "   Downloading..."
+    if ! curl -fL "${IFREXTRACTOR_URL}" -o "${IFREXTRACTOR_ZIP}"; then
+        echo "   ✗ Download failed. Please check your internet connection."
+        exit 1
+    fi
+    unzip -o "${IFREXTRACTOR_ZIP}" -d "${EXTERNAL_DIR}" > /dev/null 2>&1
     if [ -f "${EXTERNAL_DIR}/ifrextractor" ]; then
         chmod +x "${EXTERNAL_DIR}/ifrextractor"
-        echo "   ✓ IFRExtractor installed"
+        # Verify it's a valid ELF binary
+        if file "${EXTERNAL_DIR}/ifrextractor" | grep -q "ELF"; then
+            echo "   ✓ IFRExtractor installed"
+        else
+            echo "   ✗ Downloaded file is not a valid binary"
+            rm -f "${EXTERNAL_DIR}/ifrextractor"
+            exit 1
+        fi
     else
         echo "   ✗ IFRExtractor installation failed"
         exit 1

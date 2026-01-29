@@ -3,3 +3,6 @@
 /biosutilities/external/
 /external/
 /venv/
+__pycache__/
+*.pyc
+*.pyo
